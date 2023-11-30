@@ -1,0 +1,44 @@
+#Importando bibliotecas necessarias
+import requests
+import pandas as pd
+
+#Parametros
+url = 'http://www.fundamentus.com.br/resultado.php'
+header = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36"
+ }
+
+#Realizando requisição
+req = requests.get(url, headers=header)
+
+#Tratamento dos dados
+df = pd.read_html(req.text,  decimal=',', thousands='.')[0]
+for coluna in ['Div.Yield', 'Mrg. Líq.', 'P/L', 'ROE', 'Cresc. Rec.5a']:
+  df[coluna] = df[coluna].apply(str).str.replace('.','')
+  df[coluna] = df[coluna].apply(str).str.replace(',','.')
+  df[coluna] = df[coluna].apply(str).str.rstrip('%').astype('float') / 100
+
+#Filtros
+df = df[df['Liq.2meses'] > 100000]
+df = df[df['Dív.Brut/ Patrim.'] < 1]
+df = df[df['P/L'] > 0]
+df = df[df['Mrg. Líq.'] > 0.15]
+df = df[df['P/L'] <= 15]
+df = df[df['Cresc. Rec.5a'] > 0.18]
+
+#Rankeamento
+ranking = pd.DataFrame()
+ranking = df[['Papel','Div.Yield', 'Mrg. Líq.', 'P/L', 'ROE', 'Cresc. Rec.5a']]
+ranking['Div.Yield rank'] = ranking['Div.Yield'].rank(method='max')
+ranking['Mrg. Líq. rank'] = ranking['Mrg. Líq.'].rank(method='max')
+ranking['P/L rank'] = ranking['P/L'].rank(method='max',ascending=False)
+ranking['ROE rank'] = ranking['ROE'].rank(method='max')
+ranking['Cresc. Rec.5a rank'] = ranking['Cresc. Rec.5a'].rank(method='max')
+
+#Somatório do Ranking
+sranking = ranking[['Papel','Div.Yield rank','Mrg. Líq. rank','P/L rank','ROE rank','Cresc. Rec.5a rank']]
+sranking['Total'] = sranking['Div.Yield rank']+sranking['Mrg. Líq. rank']+sranking['P/L rank']+sranking['ROE rank']+sranking['Cresc. Rec.5a rank']
+sranking = sranking.sort_values(by='Total', ascending=False)
+print('Factor Investing')
+print('Isso não é uma recomendação de compra, é preciso avaliar cada papel e setor')
+sranking.head(50)
