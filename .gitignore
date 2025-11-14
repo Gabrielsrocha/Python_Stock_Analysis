@@ -1,14 +1,57 @@
-# Ambiente virtual
-venv/
-.env/
-
-# Cache do Python
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Configurações de IDEs
+# Virtual Environment
+.venv
+
+# IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Arquivos temporários
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Data files
+data/*.csv
+data/*.xlsx
+!data/.gitkeep
+
+# Logs
 *.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
